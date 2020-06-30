@@ -38,7 +38,7 @@ class AssetPicker extends StatelessWidget {
         ),
         gridCount = gridCount ?? 4,
         themeColor =
-            pickerTheme?.colorScheme?.primary ?? themeColor ?? C.themeColor,
+            pickerTheme?.colorScheme?.secondary ?? themeColor ?? C.themeColor,
         super(key: key) {
     Constants.textDelegate = textDelegate ?? DefaultTextDelegate();
   }
@@ -210,6 +210,21 @@ class AssetPicker extends StatelessWidget {
           brightness: Brightness.dark,
           elevation: 0,
         ),
+        colorScheme: ColorScheme(
+          primary: Colors.grey[900],
+          primaryVariant: Colors.grey[900],
+          secondary: themeColor,
+          secondaryVariant: themeColor,
+          background: Colors.grey[900],
+          surface: Colors.grey[900],
+          brightness: Brightness.dark,
+          error: const Color(0xffcf6679),
+          onPrimary: Colors.black,
+          onSecondary: Colors.black,
+          onSurface: Colors.white,
+          onBackground: Colors.white,
+          onError: Colors.black,
+        ),
       );
 
   /// [ThemeData] for picker.
@@ -260,15 +275,15 @@ class AssetPicker extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: theme.dividerColor.withAlpha(150),
+                          color: theme.iconTheme.color.withOpacity(0.5),
                         ),
                         child: Transform.rotate(
                           angle: provider.isSwitchingPath ? math.pi : 0.0,
                           alignment: Alignment.center,
-                          child: const Icon(
+                          child: Icon(
                             Icons.keyboard_arrow_down,
-                            color: Colors.black,
                             size: 20.0,
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                       ),
@@ -308,8 +323,8 @@ class AssetPicker extends StatelessWidget {
                       if (_.watch<AssetPickerProvider>().requestType ==
                           RequestType.audio) {
                         return ColoredBox(
-                          color: Colors.white12,
-                          child: Center(child: Icon(Icons.audiotrack)),
+                          color: theme.colorScheme.primary.withOpacity(0.12),
+                          child: const Center(child: Icon(Icons.audiotrack)),
                         );
                       }
 
@@ -325,7 +340,9 @@ class AssetPicker extends StatelessWidget {
                           fit: BoxFit.cover,
                         );
                       } else {
-                        return ColoredBox(color: Colors.white12);
+                        return ColoredBox(
+                          color: theme.colorScheme.primary.withOpacity(0.12),
+                        );
                       }
                     },
                   ),
@@ -349,8 +366,10 @@ class AssetPicker extends StatelessWidget {
                       ),
                       Text(
                         '(${pathEntity.assetCount})',
-                        style:
-                            TextStyle(color: Colors.grey[600], fontSize: 18.0),
+                        style: TextStyle(
+                          color: theme.textTheme.caption.color,
+                          fontSize: 18.0,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -406,7 +425,7 @@ class AssetPicker extends StatelessWidget {
             child: Container(
               width: Screens.width,
               height: maxHeight,
-              decoration: BoxDecoration(color: theme.primaryColor),
+              decoration: BoxDecoration(color: theme.colorScheme.background),
               child: Selector<AssetPickerProvider,
                   Map<AssetPathEntity, Uint8List>>(
                 selector: (BuildContext _, AssetPickerProvider provider) =>
@@ -492,11 +511,6 @@ class AssetPicker extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(3.0),
             ),
-            elevation: 0.0,
-            disabledElevation: 0.0,
-            focusElevation: 0.0,
-            highlightElevation: 0.0,
-            hoverElevation: 0.0,
             child: Text(
               provider.isSelectedNotEmpty && !isSingleAssetMode
                   ? '${Constants.textDelegate.confirm}'
@@ -504,8 +518,8 @@ class AssetPicker extends StatelessWidget {
                   : Constants.textDelegate.confirm,
               style: TextStyle(
                 color: provider.isSelectedNotEmpty
-                    ? Colors.white
-                    : Colors.grey[600],
+                    ? theme.textTheme.bodyText1.color
+                    : theme.textTheme.caption.color,
                 fontSize: 17.0,
                 fontWeight: FontWeight.normal,
               ),
@@ -532,7 +546,7 @@ class AssetPicker extends StatelessWidget {
             gradient: LinearGradient(
               begin: AlignmentDirectional.bottomCenter,
               end: AlignmentDirectional.topCenter,
-              colors: <Color>[Colors.black45, Colors.transparent],
+              colors: <Color>[theme.dividerColor, Colors.transparent],
             ),
           ),
           child: Align(
@@ -575,7 +589,7 @@ class AssetPicker extends StatelessWidget {
           gradient: LinearGradient(
             begin: AlignmentDirectional.bottomCenter,
             end: AlignmentDirectional.topCenter,
-            colors: <Color>[Colors.black45, Colors.transparent],
+            colors: <Color>[theme.dividerColor, Colors.transparent],
           ),
         ),
         child: Padding(
@@ -592,6 +606,12 @@ class AssetPicker extends StatelessWidget {
 
   /// Video asset type indicator.
   /// 视频类型资源指示
+  ///
+  /// Videos often contains various of color in the cover,
+  /// so in order to keep the content visible in most cases,
+  /// the color of the indicator has been set to [Colors.white].
+  /// 视频封面通常包含各种颜色，为了保证内容在一般情况下可见，此处
+  /// 将指示器的图标和文字设置为 [Colors.white]。
   Widget videoIndicator(AssetEntity asset) {
     return Align(
       alignment: AlignmentDirectional.bottomStart,
@@ -603,18 +623,26 @@ class AssetPicker extends StatelessWidget {
           gradient: LinearGradient(
             begin: AlignmentDirectional.bottomCenter,
             end: AlignmentDirectional.topCenter,
-            colors: <Color>[Colors.black45, Colors.transparent],
+            colors: <Color>[theme.dividerColor, Colors.transparent],
           ),
         ),
         child: Row(
           children: <Widget>[
-            Icon(Icons.videocam, size: 24.0),
+            const Icon(
+              Icons.videocam,
+              size: 24.0,
+              color: Colors.white,
+            ),
             Padding(
               padding: const EdgeInsets.only(left: 4.0),
               child: Text(
                 Constants.textDelegate.durationIndicatorBuilder(
-                    Duration(seconds: asset.duration)),
-                style: const TextStyle(fontSize: 16.0),
+                  Duration(seconds: asset.duration),
+                ),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16.0,
+                ),
               ),
             ),
           ],
@@ -647,7 +675,9 @@ class AssetPicker extends StatelessWidget {
             },
             child: AnimatedContainer(
               duration: switchingPathDuration,
-              color: selected ? Colors.black45 : Colors.black.withOpacity(0.1),
+              color: selected
+                  ? theme.colorScheme.primary.withOpacity(0.45)
+                  : Colors.black.withOpacity(0.1),
             ),
           ), // 点击预览同目录下所有资源
         );
@@ -655,7 +685,7 @@ class AssetPicker extends StatelessWidget {
     );
   }
 
-  /// Indicator for asset selected status.
+  /// Indicator for assets selected status.
   /// 资源是否已选的指示器
   Widget _selectIndicator(AssetEntity asset) {
     return Selector<AssetPickerProvider, List<AssetEntity>>(
@@ -663,6 +693,7 @@ class AssetPicker extends StatelessWidget {
           provider.selectedAssets,
       builder: (BuildContext _, List<AssetEntity> selectedAssets, Widget __) {
         final bool selected = selectedAssets.contains(asset);
+        final double indicatorSize = Screens.width / gridCount / 3;
         return Positioned(
           top: 0.0,
           right: 0.0,
@@ -678,33 +709,43 @@ class AssetPicker extends StatelessWidget {
                 provider.selectAsset(asset);
               }
             },
-            child: AnimatedContainer(
-              duration: switchingPathDuration,
-              margin: EdgeInsets.all(isAppleOS ? 10.0 : 6.0),
-              width: isAppleOS ? 28.0 : 20.0,
-              height: isAppleOS ? 28.0 : 20.0,
-              decoration: BoxDecoration(
-                border: !selected
-                    ? Border.all(color: Colors.white, width: 2.0)
-                    : null,
-                color: selected ? themeColor : null,
-                shape: BoxShape.circle,
-              ),
-              child: AnimatedSwitcher(
+            child: Container(
+              margin: EdgeInsets.all(
+                  Screens.width / gridCount / (isAppleOS ? 12.0 : 15.0)),
+              width: indicatorSize,
+              height: indicatorSize,
+              alignment: AlignmentDirectional.topEnd,
+              child: AnimatedContainer(
                 duration: switchingPathDuration,
-                reverseDuration: switchingPathDuration,
-                child: selected
-                    ? isSingleAssetMode
-                        ? Icon(Icons.check, size: 18.0)
-                        : Text(
-                            '${selectedAssets.indexOf(asset) + 1}',
-                            style: TextStyle(
-                              fontSize: isAppleOS ? 16.0 : 14.0,
-                              fontWeight:
-                                  isAppleOS ? FontWeight.w600 : FontWeight.bold,
-                            ),
-                          )
-                    : const SizedBox.shrink(),
+                width: indicatorSize / (isAppleOS ? 1.25 : 1.5),
+                height: indicatorSize / (isAppleOS ? 1.25 : 1.5),
+                decoration: BoxDecoration(
+                  border: !selected
+                      ? Border.all(color: Colors.white, width: 2.0)
+                      : null,
+                  color: selected ? themeColor : null,
+                  shape: BoxShape.circle,
+                ),
+                child: AnimatedSwitcher(
+                  duration: switchingPathDuration,
+                  reverseDuration: switchingPathDuration,
+                  child: selected
+                      ? isSingleAssetMode
+                          ? Icon(Icons.check, size: 18.0)
+                          : Text(
+                              '${selectedAssets.indexOf(asset) + 1}',
+                              style: TextStyle(
+                                color: selected
+                                    ? theme.textTheme.bodyText1.color
+                                    : null,
+                                fontSize: isAppleOS ? 16.0 : 14.0,
+                                fontWeight: isAppleOS
+                                    ? FontWeight.w600
+                                    : FontWeight.bold,
+                              ),
+                            )
+                      : const SizedBox.shrink(),
+                ),
               ),
             ),
           ),
@@ -719,7 +760,7 @@ class AssetPicker extends StatelessWidget {
         child: Text(
           Constants.textDelegate.loadFailed,
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontSize: 18.0),
+          style: const TextStyle(fontSize: 18.0),
         ),
       );
 
@@ -797,7 +838,7 @@ class AssetPicker extends StatelessWidget {
               gradient: LinearGradient(
                 begin: AlignmentDirectional.topCenter,
                 end: AlignmentDirectional.bottomCenter,
-                colors: <Color>[Colors.black45, Colors.transparent],
+                colors: <Color>[theme.dividerColor, Colors.transparent],
               ),
             ),
             child: Padding(
@@ -811,7 +852,7 @@ class AssetPicker extends StatelessWidget {
             ),
           ),
         ),
-        Center(child: Icon(Icons.audiotrack)),
+        const Center(child: Icon(Icons.audiotrack)),
         _selectedBackdrop(context, index, asset),
         audioIndicator(asset),
       ],
@@ -925,7 +966,9 @@ class AssetPicker extends StatelessWidget {
                           '(${provider.selectedAssets.length})'
                       : Constants.textDelegate.preview,
                   style: TextStyle(
-                    color: isSelectedNotEmpty ? null : Colors.grey[600],
+                    color: isSelectedNotEmpty
+                        ? null
+                        : theme.textTheme.caption.color,
                     fontSize: 18.0,
                   ),
                 );
@@ -992,7 +1035,7 @@ class AssetPicker extends StatelessWidget {
               )
             : IconButton(
                 onPressed: Navigator.of(context).maybePop,
-                icon: Icon(Icons.close),
+                icon: const Icon(Icons.close),
               ),
       );
 
