@@ -1,10 +1,11 @@
 ///
-/// [Author] Alex (https://github.com/AlexVincent525)
+/// [Author] Alex (https://github.com/Alex525)
 /// [Date] 2020-05-31 21:17
 ///
 import 'package:flutter/material.dart';
 import 'package:flutter_common_exports/flutter_common_exports.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 import '../constants/picker_model.dart';
 import '../main.dart';
@@ -38,7 +39,6 @@ class _SingleAssetPageState extends State<SingleAssetPage> {
               context,
               maxAssets: maxAssetsCount,
               selectedAssets: assets,
-              themeColor: themeColor,
               requestType: RequestType.image,
             );
           },
@@ -55,7 +55,6 @@ class _SingleAssetPageState extends State<SingleAssetPage> {
               context,
               maxAssets: maxAssetsCount,
               selectedAssets: assets,
-              themeColor: themeColor,
               requestType: RequestType.video,
             );
           },
@@ -72,8 +71,41 @@ class _SingleAssetPageState extends State<SingleAssetPage> {
               context,
               maxAssets: maxAssetsCount,
               selectedAssets: assets,
-              themeColor: themeColor,
               requestType: RequestType.audio,
+            );
+          },
+        ),
+        PickMethodModel(
+          icon: '📷',
+          name: 'Pick from camera',
+          description: 'Allow pick asset through camera.',
+          method: (
+            BuildContext context,
+            List<AssetEntity> assets,
+          ) async {
+            return await AssetPicker.pickAssets(
+              context,
+              maxAssets: maxAssetsCount,
+              selectedAssets: assets,
+              requestType: RequestType.common,
+              customItemPosition: CustomItemPosition.prepend,
+              customItemBuilder: (BuildContext context) {
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () async {
+                    final AssetEntity result = await CameraPicker.pickFromCamera(
+                      context,
+                      isAllowRecording: true,
+                    );
+                    if (result != null) {
+                      Navigator.of(context).pop(<AssetEntity>[result]);
+                    }
+                  },
+                  child: const Center(
+                    child: Icon(Icons.camera_enhance, size: 42.0),
+                  ),
+                );
+              },
             );
           },
         ),
@@ -89,25 +121,7 @@ class _SingleAssetPageState extends State<SingleAssetPage> {
               context,
               maxAssets: maxAssetsCount,
               selectedAssets: assets,
-              themeColor: themeColor,
               requestType: RequestType.common,
-            );
-          },
-        ),
-        PickMethodModel(
-          icon: '📱',
-          name: 'All picker',
-          description: 'Pick all type of assets.',
-          method: (
-            BuildContext context,
-            List<AssetEntity> assets,
-          ) async {
-            return await AssetPicker.pickAssets(
-              context,
-              maxAssets: maxAssetsCount,
-              selectedAssets: assets,
-              themeColor: themeColor,
-              requestType: RequestType.all,
             );
           },
         ),
@@ -126,8 +140,48 @@ class _SingleAssetPageState extends State<SingleAssetPage> {
               pageSize: 120,
               maxAssets: maxAssetsCount,
               selectedAssets: assets,
-              themeColor: themeColor,
               requestType: RequestType.all,
+            );
+          },
+        ),
+        PickMethodModel(
+          icon: '⏳',
+          name: 'Custom filter options',
+          description: 'Add filter options for the picker.',
+          method: (
+            BuildContext context,
+            List<AssetEntity> assets,
+          ) async {
+            return await AssetPicker.pickAssets(
+              context,
+              maxAssets: maxAssetsCount,
+              selectedAssets: assets,
+              requestType: RequestType.video,
+              filterOptions: FilterOptionGroup()
+                ..setOption(
+                  AssetType.video,
+                  FilterOption(
+                    durationConstraint: DurationConstraint(
+                      max: 1.minutes,
+                    ),
+                  ),
+                ),
+            );
+          },
+        ),
+        PickMethodModel(
+          icon: '🎭',
+          name: 'Wechat moment',
+          description: 'Pick assets just like the wechat moment pattern.',
+          method: (
+            BuildContext context,
+            List<AssetEntity> assets,
+          ) async {
+            return await AssetPicker.pickAssets(
+              context,
+              maxAssets: maxAssetsCount,
+              selectedAssets: assets,
+              specialPickerType: SpecialPickerType.wechatMoment,
             );
           },
         ),

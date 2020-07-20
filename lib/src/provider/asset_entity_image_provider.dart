@@ -1,5 +1,5 @@
 ///
-/// [Author] Alex (https://github.com/AlexVincent525)
+/// [Author] Alex (https://github.com/Alex525)
 /// [Date] 2020/3/20 14:07
 ///
 import 'dart:typed_data';
@@ -80,7 +80,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   /// 从图片后缀判断图片类型
   ///
   /// ⚠ Not all the system version support read file name from the entity,
-  /// so this method might not working sometime.
+  /// so this method might not work sometime.
   /// 并非所有的系统版本都支持读取文件名，所以该方法有时无法返回正确的type。
   ImageFileType _getType() {
     ImageFileType type;

@@ -1,5 +1,5 @@
 ///
-/// [Author] Alex (https://github.com/AlexVincent525)
+/// [Author] Alex (https://github.com/Alex525)
 /// [Date] 2020/3/31 15:28
 ///
 import 'dart:math' as math;
@@ -21,6 +21,7 @@ class AssetPickerProvider extends ChangeNotifier {
     this.pathThumbSize = 80,
     this.requestType = RequestType.image,
     this.sortPathDelegate = SortPathDelegate.common,
+    this.filterOptions,
     List<AssetEntity> selectedAssets,
     Duration routeDuration,
   }) {
@@ -56,6 +57,13 @@ class AssetPickerProvider extends ChangeNotifier {
   /// 资源路径排序的实现
   final SortPathDelegate sortPathDelegate;
 
+  /// Filter options for the picker.
+  /// 选择器的筛选条件
+  ///
+  /// Will be merged into the base configuration.
+  /// 将会与基础条件进行合并。
+  final FilterOptionGroup filterOptions;
+
   /// Clear all fields when dispose.
   /// 销毁时重置所有内容
   @override
@@ -69,7 +77,7 @@ class AssetPickerProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  /// Whether there's any assets on the devices.
+  /// Whether there're any assets on the devices.
   /// 设备上是否有资源文件
   bool _isAssetsEmpty = false;
 
@@ -83,7 +91,7 @@ class AssetPickerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Whether there's any assets that can be displayed.
+  /// Whether there're any assets that can be displayed.
   /// 是否有资源可供显示
   bool _hasAssetsToDisplay = false;
 
@@ -98,11 +106,11 @@ class AssetPickerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Whether there's more assets waiting for load.
+  /// Whether there're more assets waiting for load.
   /// 是否还有更多资源可以加载
   bool get hasMoreToLoad => _currentAssets.length < _totalAssetsCount;
 
-  /// Current page for assets list.
+  /// The current page for assets list.
   /// 当前加载的资源列表分页数
   int get currentAssetsListPage =>
       (math.max(1, _currentAssets.length) / pageSize).ceil();
@@ -122,7 +130,7 @@ class AssetPickerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// If path switcher was opened.
+  /// If path switcher opened.
   /// 是否正在进行路径选择
   bool _isSwitchingPath = false;
 
@@ -198,18 +206,26 @@ class AssetPickerProvider extends ChangeNotifier {
   /// Get assets path entities.
   /// 获取所有的资源路径
   Future<void> getAssetPathList() async {
+    /// Initial base options.
+    /// Enable need title for audios and image to get proper display.
+    final FilterOptionGroup options = FilterOptionGroup()
+      ..setOption(
+        AssetType.audio,
+        const FilterOption(needTitle: true),
+      )
+      ..setOption(
+        AssetType.image,
+        const FilterOption(needTitle: true),
+      );
+
+    /// Merge user's filter option into base options if it's not null.
+    if (filterOptions != null) {
+      options.merge(filterOptions);
+    }
+
     final List<AssetPathEntity> _list = await PhotoManager.getAssetPathList(
       type: requestType,
-      // Enable need title for audio and image to get proper display.
-      filterOption: FilterOptionGroup()
-        ..setOption(
-          AssetType.audio,
-          const FilterOption(needTitle: true),
-        )
-        ..setOption(
-          AssetType.image,
-          const FilterOption(needTitle: true),
-        ),
+      filterOption: options,
     );
 
     /// Sort path using sort path delegate.

@@ -1,5 +1,5 @@
 ///
-/// [Author] Alex (https://github.com/AlexVincent525)
+/// [Author] Alex (https://github.com/Alex525)
 /// [Date] 2020/3/31 16:27
 ///
 import 'dart:async';
@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../constants/constants.dart';
-import '../constants/zoom_page_transition.dart';
+
 import 'builder/audio_page_builder.dart';
 import 'builder/fade_image_builder.dart';
 import 'builder/image_page_builder.dart';
@@ -30,6 +30,7 @@ class AssetPickerViewer extends StatefulWidget {
     @required this.themeData,
     this.selectedAssets,
     this.selectorProvider,
+    this.specialPickerType,
   }) : super(key: key);
 
   /// Current previewing index in assets.
@@ -48,14 +49,21 @@ class AssetPickerViewer extends StatefulWidget {
   /// 资源选择器的状态保持
   final AssetPickerProvider selectorProvider;
 
-  /// Theme for viewer.
+  /// Theme for the viewer.
   /// 主题
   final ThemeData themeData;
+
+  /// The current special picker type for the viewer.
+  /// 当前特殊选择类型
+  ///
+  /// If the type is not null, the title of the viewer will not display.
+  /// 如果类型不为空，则标题将不会显示。
+  final SpecialPickerType specialPickerType;
 
   @override
   AssetPickerViewerState createState() => AssetPickerViewerState();
 
-  /// Static method to push with navigator.
+  /// Static method to push with the navigator.
   /// 跳转至选择预览的静态方法
   static Future<List<AssetEntity>> pushToViewer(
     BuildContext context, {
@@ -64,6 +72,7 @@ class AssetPickerViewer extends StatefulWidget {
     @required ThemeData themeData,
     List<AssetEntity> selectedAssets,
     AssetPickerProvider selectorProvider,
+    SpecialPickerType specialPickerType,
   }) async {
     try {
       final Widget viewer = AssetPickerViewer(
@@ -72,6 +81,7 @@ class AssetPickerViewer extends StatefulWidget {
         themeData: themeData,
         selectedAssets: selectedAssets,
         selectorProvider: selectorProvider,
+        specialPickerType: specialPickerType,
       );
       final PageRouteBuilder<List<AssetEntity>> pageRoute =
           PageRouteBuilder<List<AssetEntity>>(
@@ -88,11 +98,7 @@ class AssetPickerViewer extends StatefulWidget {
           Animation<double> secondaryAnimation,
           Widget child,
         ) {
-          return ZoomPageTransition(
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            child: child,
-          );
+          return FadeTransition(opacity: animation, child: child);
         },
       );
       final List<AssetEntity> result =
@@ -110,7 +116,7 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
   /// [StreamController] for viewing page index update.
   /// 用于更新当前正在浏览的资源页码的流控制器
   ///
-  /// The main purpose is to narrow down build parts when page index is changing, prevent
+  /// The main purpose is narrow down build parts when page index is changing, prevent
   /// widely [setState] and causing other widgets rebuild.
   /// 使用 [StreamController] 的主要目的是缩小页码变化时构建组件的范围，
   /// 防止滥用 [setState] 导致其他部件重新构建。
@@ -145,11 +151,11 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
   /// 当前正在预览的资源索引
   int currentIndex;
 
-  /// Whether detail widgets is displayed.
+  /// Whether detail widgets displayed.
   /// 详情部件是否显示
   bool isDisplayingDetail = true;
 
-  /// Getter for current asset.
+  /// Getter for the current asset.
   /// 当前资源的Getter
   AssetEntity get currentAsset => widget.assets.elementAt(currentIndex);
 
@@ -164,13 +170,13 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
   @override
   void initState() {
     super.initState();
-    // TODO(Alex): Currently hide status bar will cause the viewport shaking. So commented out.
 
+    // TODO(Alex): Currently hide status bar will cause the viewport shaking on Android.
     /// Hide system status bar automatically on iOS.
     /// 在iOS设备上自动隐藏状态栏
-//    if (Platform.isIOS) {
-//      SystemChrome.setEnabledSystemUIOverlays(<SystemUiOverlay>[]);
-//    }
+    if (Platform.isIOS) {
+      SystemChrome.setEnabledSystemUIOverlays(<SystemUiOverlay>[]);
+    }
     _doubleTapAnimationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
@@ -188,7 +194,7 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
 
   @override
   void dispose() {
-//    SystemChrome.restoreSystemUIOverlays();
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     _doubleTapAnimationController?.dispose();
     pageStreamController?.close();
     super.dispose();
@@ -302,7 +308,7 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
           child: Row(
             children: <Widget>[
               const BackButton(),
-              if (!isAppleOS)
+              if (!isAppleOS && widget.specialPickerType == null)
                 StreamBuilder<int>(
                   initialData: currentIndex,
                   stream: pageStreamController.stream,
@@ -318,7 +324,9 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
                 ),
               const Spacer(),
               if (isAppleOS && provider != null) selectButton,
-              if (!isAppleOS && provider != null) confirmButton(context),
+              if (!isAppleOS && provider != null ||
+                  widget.specialPickerType == SpecialPickerType.wechatMoment)
+                confirmButton(context),
             ],
           ),
         ),
@@ -327,7 +335,7 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
   /// Confirm button.
   /// 确认按钮
   ///
-  /// It'll pop with [AssetPickerProvider.selectedAssets] when there're any assets were chosen.
+  /// It'll pop with [AssetPickerProvider.selectedAssets] when there're any assets chosen.
   /// The [PhotoSelector] will recognize and pop too.
   /// 当有资源已选时，点击按钮将把已选资源通过路由返回。
   /// 资源选择器将识别并一同返回。
@@ -341,30 +349,61 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
             Widget __,
           ) {
             return MaterialButton(
-              minWidth: provider.isSelectedNotEmpty ? 48.0 : 20.0,
+              minWidth: () {
+                if (widget.specialPickerType ==
+                    SpecialPickerType.wechatMoment) {
+                  return 48.0;
+                }
+                return provider.isSelectedNotEmpty ? 48.0 : 20.0;
+              }(),
               height: 32.0,
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              color: provider.isSelectedNotEmpty
-                  ? widget.themeData.colorScheme.secondary
-                  : widget.themeData.dividerColor,
+              color: () {
+                if (widget.specialPickerType ==
+                    SpecialPickerType.wechatMoment) {
+                  return widget.themeData.colorScheme.secondary;
+                }
+                return provider.isSelectedNotEmpty
+                    ? widget.themeData.colorScheme.secondary
+                    : widget.themeData.dividerColor;
+              }(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(3.0),
               ),
               child: Text(
-                provider.isSelectedNotEmpty
-                    ? '${Constants.textDelegate.confirm}(${provider.currentlySelectedAssets.length}'
+                () {
+                  if (widget.specialPickerType ==
+                      SpecialPickerType.wechatMoment) {
+                    return Constants.textDelegate.confirm;
+                  }
+                  if (provider.isSelectedNotEmpty) {
+                    return '${Constants.textDelegate.confirm}'
+                        '(${provider.currentlySelectedAssets.length}'
                         '/'
-                        '${widget.selectorProvider.maxAssets})'
-                    : Constants.textDelegate.confirm,
+                        '${widget.selectorProvider.maxAssets})';
+                  }
+                  return Constants.textDelegate.confirm;
+                }(),
                 style: TextStyle(
-                  color: provider.isSelectedNotEmpty
-                      ? widget.themeData.textTheme.bodyText1.color
-                      : widget.themeData.textTheme.caption.color,
+                  color: () {
+                    if (widget.specialPickerType ==
+                        SpecialPickerType.wechatMoment) {
+                      return widget.themeData.textTheme.bodyText1.color;
+                    }
+                    return provider.isSelectedNotEmpty
+                        ? widget.themeData.textTheme.bodyText1.color
+                        : widget.themeData.textTheme.caption.color;
+                  }(),
                   fontSize: 17.0,
                   fontWeight: FontWeight.normal,
                 ),
               ),
               onPressed: () {
+                if (widget.specialPickerType ==
+                    SpecialPickerType.wechatMoment) {
+                  Navigator.of(context).pop(<AssetEntity>[currentAsset]);
+                  return;
+                }
                 if (provider.isSelectedNotEmpty) {
                   Navigator.of(context).pop(provider.currentlySelectedAssets);
                 }
@@ -375,7 +414,7 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
         ),
       );
 
-  /// Thumb item widget in bottom detail.
+  /// Thumb item widgets in bottom detail.
   /// 底部信息栏单个资源缩略部件
   Widget _bottomDetailItem(BuildContext _, int index) {
     return Padding(
@@ -454,7 +493,7 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
     );
   }
 
-  /// Preview item widget for audio.
+  /// Preview item widgets for audios.
   /// 音频的底部预览部件
   Widget _audioPreviewItem(AssetEntity asset) {
     return ColoredBox(
@@ -463,7 +502,7 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
     );
   }
 
-  /// Preview item widget for image.
+  /// Preview item widgets for images.
   /// 音频的底部预览部件
   Widget _imagePreviewItem(AssetEntity asset) {
     return Positioned.fill(
@@ -479,7 +518,7 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
     );
   }
 
-  /// Preview item widget for video.
+  /// Preview item widgets for video.
   /// 音频的底部预览部件
   Widget _videoPreviewItem(AssetEntity asset) {
     return Positioned.fill(
@@ -660,7 +699,7 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
         ),
       );
 
-  /// Item widget when [AssetEntity.thumbData] load failed.
+  /// The item widget when [AssetEntity.thumbData] load failed.
   /// 资源缩略数据加载失败时使用的部件
   Widget get _failedItem => Center(
         child: Text(

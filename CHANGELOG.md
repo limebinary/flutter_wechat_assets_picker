@@ -1,3 +1,23 @@
+# [4.0.0]
+
+* Drop `asset_audio_player` .
+* Experimenting status bar hidden on iOS.
+* Remove video player listener before pause.
+
+## Breaking changes
+
+* `TextDelegate` -> `AssetsPickerTextDelegate` .
+
+# [3.0.0+1]
+
+* Constraint dependencies version.
+
+# [3.0.0]
+
+* Add `FilterOptionGroup`. Fix #41 .
+* Add `SpecialPickerType`. Fix #37 .
+* Add custom item build mode. Fix #39 .
+
 # [2.2.1]
 
 * Introduce `ColorScheme` for theme details. Fixed #32 .
