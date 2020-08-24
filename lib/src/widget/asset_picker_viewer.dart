@@ -28,6 +28,7 @@ class AssetPickerViewer extends StatefulWidget {
     @required this.currentIndex,
     @required this.assets,
     @required this.themeData,
+    this.previewThumbSize,
     this.selectedAssets,
     this.selectorProvider,
     this.specialPickerType,
@@ -53,6 +54,10 @@ class AssetPickerViewer extends StatefulWidget {
   /// 主题
   final ThemeData themeData;
 
+  /// Thumb size for the preview of images in the viewer.
+  /// 预览时图片的缩略图大小
+  final List<int> previewThumbSize;
+
   /// The current special picker type for the viewer.
   /// 当前特殊选择类型
   ///
@@ -70,6 +75,7 @@ class AssetPickerViewer extends StatefulWidget {
     int currentIndex = 0,
     @required List<AssetEntity> assets,
     @required ThemeData themeData,
+    List<int> previewThumbSize,
     List<AssetEntity> selectedAssets,
     AssetPickerProvider selectorProvider,
     SpecialPickerType specialPickerType,
@@ -79,6 +85,7 @@ class AssetPickerViewer extends StatefulWidget {
         currentIndex: currentIndex,
         assets: assets,
         themeData: themeData,
+        previewThumbSize: previewThumbSize,
         selectedAssets: selectedAssets,
         selectorProvider: selectorProvider,
         specialPickerType: specialPickerType,
@@ -171,12 +178,6 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
   void initState() {
     super.initState();
 
-    // TODO(Alex): Currently hide status bar will cause the viewport shaking on Android.
-    /// Hide system status bar automatically on iOS.
-    /// 在iOS设备上自动隐藏状态栏
-    if (Platform.isIOS) {
-      SystemChrome.setEnabledSystemUIOverlays(<SystemUiOverlay>[]);
-    }
     _doubleTapAnimationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
@@ -194,7 +195,6 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     _doubleTapAnimationController?.dispose();
     pageStreamController?.close();
     super.dispose();
@@ -230,11 +230,6 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
   /// 切换显示详情状态的方法
   void switchDisplayingDetail({bool value}) {
     isDisplayingDetail = value ?? !isDisplayingDetail;
-//    if (!Platform.isIOS) {
-//      SystemChrome.setEnabledSystemUIOverlays(
-//        isDisplayingDetail ? SystemUiOverlay.values : <SystemUiOverlay>[],
-//      );
-//    }
     if (mounted) {
       setState(() {});
     }
@@ -259,7 +254,11 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
         builder = AudioPageBuilder(asset: asset, state: this);
         break;
       case AssetType.image:
-        builder = ImagePageBuilder(asset: asset, state: this);
+        builder = ImagePageBuilder(
+          asset: asset,
+          state: this,
+          previewThumbSize: widget.previewThumbSize,
+        );
         break;
       case AssetType.video:
         builder = VideoPageBuilder(asset: asset, state: this);
@@ -315,7 +314,7 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
                   builder: (BuildContext _, AsyncSnapshot<int> snapshot) {
                     return Text(
                       '${snapshot.data + 1}/${widget.assets.length}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                       ),
@@ -498,7 +497,7 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
   Widget _audioPreviewItem(AssetEntity asset) {
     return ColoredBox(
       color: context.themeData.dividerColor,
-      child: Center(child: Icon(Icons.audiotrack)),
+      child: const Center(child: Icon(Icons.audiotrack)),
     );
   }
 
@@ -616,12 +615,12 @@ class AssetPickerViewerState extends State<AssetPickerViewer>
             child: isSelected
                 ? Text(
                     (currentIndex + 1).toString(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                     ),
                   )
-                : Icon(Icons.check, size: 20.0),
+                : const Icon(Icons.check, size: 20.0),
           ),
         ),
       ),

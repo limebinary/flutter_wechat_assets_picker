@@ -6,9 +6,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import 'package:wechat_assets_picker/src/constants/constants.dart';
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class AudioPageBuilder extends StatefulWidget {
   const AudioPageBuilder({
@@ -77,7 +77,7 @@ class _AudioPageBuilderState extends State<AudioPageBuilder> {
   Future<void> openAudioFile() async {
     try {
       final String url = await widget.asset.getMediaUrl();
-      assetDuration = widget.asset.duration.seconds;
+      assetDuration = Duration(seconds: widget.asset.duration);
       _controller = VideoPlayerController.network(url);
       await _controller.initialize();
       _controller.addListener(audioPlayerListener);
@@ -129,7 +129,7 @@ class _AudioPageBuilderState extends State<AudioPageBuilder> {
         },
         child: Container(
           margin: const EdgeInsets.all(20.0),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             boxShadow: <BoxShadow>[BoxShadow(color: Colors.black12)],
             shape: BoxShape.circle,
           ),

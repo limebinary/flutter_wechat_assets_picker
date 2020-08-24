@@ -3,10 +3,10 @@
 /// [Date] 2020-05-31 21:17
 ///
 import 'package:flutter/material.dart';
-import 'package:flutter_common_exports/flutter_common_exports.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
+import '../constants/extensions.dart';
 import '../constants/picker_model.dart';
 import '../main.dart';
 
@@ -161,9 +161,9 @@ class _SingleAssetPageState extends State<SingleAssetPage> {
               filterOptions: FilterOptionGroup()
                 ..setOption(
                   AssetType.video,
-                  FilterOption(
+                  const FilterOption(
                     durationConstraint: DurationConstraint(
-                      max: 1.minutes,
+                      max: Duration(minutes: 1),
                     ),
                   ),
                 ),
@@ -256,7 +256,7 @@ class _SingleAssetPageState extends State<SingleAssetPage> {
                 children: <Widget>[
                   Text(
                     model.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
@@ -264,11 +264,13 @@ class _SingleAssetPageState extends State<SingleAssetPage> {
                   Text(
                     model.description,
                     style: context.themeData.textTheme.caption,
+                    maxLines: 2,
+                    overflow: TextOverflow.fade,
                   ),
                 ],
               ),
             ),
-            Icon(
+            const Icon(
               Icons.chevron_right,
               color: Colors.grey,
             ),

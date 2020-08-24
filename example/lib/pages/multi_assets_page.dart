@@ -3,10 +3,10 @@
 /// [Date] 2020-05-31 20:21
 ///
 import 'package:flutter/material.dart';
-import 'package:flutter_common_exports/flutter_common_exports.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
+import '../constants/extensions.dart';
 import '../constants/picker_model.dart';
 import '../main.dart';
 
@@ -162,9 +162,9 @@ class _MultiAssetsPageState extends State<MultiAssetsPage> {
               filterOptions: FilterOptionGroup()
                 ..setOption(
                   AssetType.video,
-                  FilterOption(
+                  const FilterOption(
                     durationConstraint: DurationConstraint(
-                      max: 1.minutes,
+                      max: Duration(minutes: 1),
                     ),
                   ),
                 ),
@@ -188,6 +188,24 @@ class _MultiAssetsPageState extends State<MultiAssetsPage> {
               customItemBuilder: (BuildContext context) {
                 return const Center(child: Text('Custom Widget'));
               },
+            );
+          },
+        ),
+        PickMethodModel(
+          icon: '🎚',
+          name: 'Custom image preview thumb size',
+          description:
+              'You can reduce the thumb size in order to get more quickly load speed.',
+          method: (
+            BuildContext context,
+            List<AssetEntity> assets,
+          ) async {
+            return await AssetPicker.pickAssets(
+              context,
+              maxAssets: maxAssetsCount,
+              selectedAssets: assets,
+              requestType: RequestType.image,
+              previewThumbSize: const <int>[300, 300],
             );
           },
         ),
@@ -261,10 +279,12 @@ class _MultiAssetsPageState extends State<MultiAssetsPage> {
                 children: <Widget>[
                   Text(
                     model.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     model.description,
@@ -275,7 +295,7 @@ class _MultiAssetsPageState extends State<MultiAssetsPage> {
                 ],
               ),
             ),
-            Icon(
+            const Icon(
               Icons.chevron_right,
               color: Colors.grey,
             ),
@@ -286,10 +306,13 @@ class _MultiAssetsPageState extends State<MultiAssetsPage> {
   }
 
   Widget get methodListView => Expanded(
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 10.0),
-          itemCount: pickMethods.length,
-          itemBuilder: methodItemBuilder,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 10.0),
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            itemCount: pickMethods.length,
+            itemBuilder: methodItemBuilder,
+          ),
         ),
       );
 
@@ -453,13 +476,13 @@ class _MultiAssetsPageState extends State<MultiAssetsPage> {
                         horizontal: 10.0,
                       ),
                       padding: const EdgeInsets.all(4.0),
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.grey,
                       ),
                       child: Text(
                         '${assets.length}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           height: 1.0,
                         ),
@@ -483,7 +506,6 @@ class _MultiAssetsPageState extends State<MultiAssetsPage> {
 
   Widget get selectedAssetsListView => Expanded(
         child: ListView.builder(
-          shrinkWrap: true,
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           scrollDirection: Axis.horizontal,
