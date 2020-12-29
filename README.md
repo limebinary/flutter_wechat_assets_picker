@@ -2,11 +2,13 @@
 
 [![pub package](https://img.shields.io/pub/v/wechat_assets_picker?logo=dart&label=stable&style=flat-square)](https://pub.dev/packages/wechat_assets_picker)
 [![pub package](https://img.shields.io/pub/v/wechat_assets_picker?color=42a012&include_prereleases&label=dev&logo=dart&style=flat-square)](https://pub.dev/packages/wechat_assets_picker)
-[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_wechat_assets_picker?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/network)
 [![Build status](https://img.shields.io/github/workflow/status/fluttercandies/flutter_wechat_assets_picker/Build%20test?label=CI&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/actions?query=workflow%3A%22Build+test%22)
 [![CodeFactor](https://img.shields.io/codefactor/grade/github/fluttercandies/flutter_wechat_assets_picker?logo=codefactor&logoColor=%23ffffff&style=flat-square)](https://www.codefactor.io/repository/github/fluttercandies/flutter_wechat_assets_picker)
 [![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_wechat_assets_picker?style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/LICENSE)
+
+[![Awesome Flutter](https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square)](https://github.com/Solido/awesome-flutter)
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_wechat_assets_picker?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/network)
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
 
 Language: English | [中文简体](README-ZH.md)
@@ -38,6 +40,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ## Category 🗂
 
+* [Migration Guide](#migration-guide-)
 * [Features](#features-)
 * [Screenshots](#screenshots-)
 * [Preparing for use](#preparing-for-use-)
@@ -49,6 +52,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 * [Usage](#usage-)
   * [Simple usage](#simple-usage)
   * [Complete param usage](#complete-param-usage)
+  * [Display selected assets](#display-selected-assets)
   * [Register assets change observe callback](#register-assets-change-observe-callback)
 * [Classes Introduction](#classes-introduction-)
   * [`AssetEntity`](#assetentity)
@@ -59,6 +63,10 @@ This project follows the [all-contributors](https://github.com/all-contributors/
   * [Create `AssetEntity` from `File` or `Uint8List` (rawData)](#create-assetentity-from-file-or-uint8list-rawdata)
   * [Console warning 'Failed to find GeneratedAppGlideModule'](#glide-warning-failed-to-find-generatedappglidemodule)
 
+## Migration Guide ♻️
+
+See [Migration Guide](doc/migration_guide.md).
+
 ## Features ✨
 
 - [x] 💚 99% simillar to WeChat style.
@@ -68,7 +76,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 - [x] 🎶 Audio asset support
 - [x] 1️⃣ Single asset mode
 - [x] 💱 i18n support
-- [x] ➕ Custom item builder (prepend/append) support
+- [x] ➕ Special item builder (prepend/append) support
 - [x] 🗂 Custom sort path delegate support
 - [x] 📝 Custom text delegate support
 - [x] ⏳ Custom filter options support ( `photo_manager` )
@@ -84,7 +92,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ## READ THIS FIRST ‼️
 
-Althought the package provide selection for assets, it still require users build their own methods to handle display/upload, etc. If you have any question about how to build it, please run the example or refer to [photo_manager](https://github.com/CaiJingLong/flutter_photo_manager) for API usage.
+Althought the package provide selection for assets, it still require users build their own methods to handle upload, image compress, etc. If you have any question about how to build it, please run the example or refer to [photo_manager](https://github.com/CaiJingLong/flutter_photo_manager) for API usage.
 
 ## Preparing for use 🍭
 
@@ -156,25 +164,26 @@ platform :osx, '10.15'
 
 ## Usage 📖
 
-| Name               | Type                       | Description                                                  | Default                             |
-| ------------------ | -------------------------- | ------------------------------------------------------------ | ----------------------------------- |
-| maxAssets          | `int`                      | Maximum asset that the picker can pick.                      | 9                                   |
-| pageSize           | `int`                      | Assets amount when assets loaded with paging. **Must be a multiple of `gridCount`.** Nullable for non paging. | 320 (80 * 4)                        |
-| pathThumbSize      | `int`                      | The size of thumb data in picker.                            | 80                                  |
-| gridCount          | `int`                      | Grid count in picker.                                        | 4                                   |
-| previewThumbSize   | `List<int>`                | Thumb size for the preview of images in the viewer.          | `null`                              |
-| requestType        | `RequestType`              | Request type for picker.                                     | `RequestType.image`                 |
-| specialPickerType  | `SpacialPickerType`        | Provide some special picker types to integrate un-common pick pattern. | `null`                              |
-| selectedAssets     | `List<AssetEntity>`        | Selected assets. Prevent duplicate selection. If you don't need to prevent duplicate selection, just don't pass it. | `null`                              |
-| themeColor         | `Color`                    | Main theme color for the picker                              | `Color(0xff00bc56)`                 |
-| pickerTheme        | `ThemeData`                | Theme data provider for the picker and the viewer.           | `null`                              |
-| sortPathDelegate   | `SortPathDeleage`          | Path entities sort delegate for the picker, sort paths as you want. | `CommonSortPathDelegate`            |
-| textDelegate       | `AssetsPickerTextDelegate` | Text delegate for the picker, for customize the texts.       | `DefaultAssetsPickerTextDelegate()` |
-| filterOptions      | `FilterOptionGroup`        | Allow users to customize assets filter options.              | `null`                              |
-| customItemBuilder  | `WidgetBuilder`            | The widget builder for the custom item.                      | `null`                              |
-| customItemPosition | `CustomItemPosition`       | Allow users set custom item in the picker with several positions. | `CustomItemPosition.none`           |
-| routeCurve         | `Curve`                    | The curve which the picker use to build page route transition. | `Curves.easeIn`                     |
-| routeDuration      | `Duration`                 | The duration which the picker use to build page route transition. | `const Duration(milliseconds: 500)` |
+| Name                      | Type                       | Description                                                  | Default                             |
+| ------------------------- | -------------------------- | ------------------------------------------------------------ | ----------------------------------- |
+| maxAssets                 | `int`                      | Maximum asset that the picker can pick.                      | 9                                   |
+| pageSize                  | `int`                      | Assets amount when assets loaded with paging. **Must be a multiple of `gridCount`.** Nullable for non paging. | 320 (80 * 4)                        |
+| pathThumbSize             | `int`                      | The size of thumb data in picker.                            | 80                                  |
+| gridCount                 | `int`                      | Grid count in picker.                                        | 4                                   |
+| previewThumbSize          | `List<int>`                | Thumb size for the preview of images in the viewer.          | `null`                              |
+| requestType               | `RequestType`              | Request type for picker.                                     | `RequestType.image`                 |
+| specialPickerType         | `SpacialPickerType`        | Provide some special picker types to integrate un-common pick pattern. | `null`                              |
+| selectedAssets            | `List<AssetEntity>`        | Selected assets. Prevent duplicate selection. If you don't need to prevent duplicate selection, just don't pass it. | `null`                              |
+| themeColor                | `Color`                    | Main theme color for the picker                              | `Color(0xff00bc56)`                 |
+| pickerTheme               | `ThemeData`                | Theme data provider for the picker and the viewer.           | `null`                              |
+| sortPathDelegate          | `SortPathDeleage`          | Path entities sort delegate for the picker, sort paths as you want. | `CommonSortPathDelegate`            |
+| textDelegate              | `AssetsPickerTextDelegate` | Text delegate for the picker, for customize the texts.       | `DefaultAssetsPickerTextDelegate()` |
+| filterOptions             | `FilterOptionGroup`        | Allow users to customize assets filter options.              | `null`                              |
+| specialItemBuilder        | `WidgetBuilder`            | The widget builder for the special item.                     | `null`                              |
+| specialItemPosition       | `SpecialItemPosition`      | Allow users set a special item in the picker with several positions. | `SpecialItemPosition.none`          |
+| allowSpecialItemWhenEmpty | `bool`                     | Whether the special item will display or not when assets is empty.  | `false`                             |
+| routeCurve                | `Curve`                    | The curve which the picker use to build page route transition. | `Curves.easeIn`                     |
+| routeDuration             | `Duration`                 | The duration which the picker use to build page route transition. | `const Duration(milliseconds: 500)` |
 
 ### Simple usage
 
@@ -193,6 +202,16 @@ AssetPicker.pickAsset(context).then((List<AssetEntity> assets) {
 ### Complete param usage
 
 For various type of the picker, head over to the example and run it with no doubt.
+
+### Display selected assets
+
+The `AssetEntityImageProvider` can display the thumb image of _images & videos_, and the original data of _image_. Use it like a common `ImageProvider`.
+
+```dart
+Image(image: AssetEntityImageProvider(asset, isOriginal: false))
+```
+
+Check the example for how it displays.
 
 ### Register assets change observe callback
 ```dart

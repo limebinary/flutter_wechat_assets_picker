@@ -1,12 +1,14 @@
-# Flutter仿微信资源选择器
+# Flutter 仿微信资源选择器
 
 [![pub package](https://img.shields.io/pub/v/wechat_assets_picker?color=42a012&label=%E7%A8%B3%E5%AE%9A%E7%89%88&logo=dart&style=flat-square)](https://pub.flutter-io.cn/packages/wechat_assets_picker)
 [![pub package](https://img.shields.io/pub/v/wechat_assets_picker?color=42a012&include_prereleases&label=%E5%BC%80%E5%8F%91%E7%89%88&logo=dart&style=flat-square)](https://pub.flutter-io.cn/packages/wechat_assets_picker)
-[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_wechat_assets_picker?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/network)
 [![Build status](https://img.shields.io/github/workflow/status/fluttercandies/flutter_wechat_assets_picker/Build%20test?label=%E7%8A%B6%E6%80%81&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/actions?query=workflow%3A%22Build+test%22)
 [![CodeFactor](https://img.shields.io/codefactor/grade/github/fluttercandies/flutter_wechat_assets_picker?label=%E4%BB%A3%E7%A0%81%E8%B4%A8%E9%87%8F&logo=codefactor&logoColor=%23ffffff&style=flat-square)](https://www.codefactor.io/repository/github/fluttercandies/flutter_wechat_assets_picker)
 [![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_wechat_assets_picker?label=%E5%8D%8F%E8%AE%AE&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/LICENSE)
+
+[![Awesome Flutter](https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square)](https://github.com/Solido/awesome-flutter)
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_wechat_assets_picker?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/network)
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
 
 Language: [English](README.md) | 中文简体
@@ -17,6 +19,7 @@ Language: [English](README.md) | 中文简体
 
 ## 目录 🗂
 
+* [迁移指南](#迁移指南-)
 * [特性](#特性-)
 * [截图](#截图-)
 * [准备工作](#准备工作-)
@@ -28,6 +31,7 @@ Language: [English](README.md) | 中文简体
 * [使用方法](#使用方法-)
   * [简单的使用方法](#简单的使用方法)
   * [完整参数的使用方法](#完整参数的使用方法)
+  * [展示选中的资源](#展示选中的资源)
   * [注册资源变化回调](#注册资源变化回调)
 * [类介绍](#类介绍-)
   * [`AssetEntity`](#assetentity)
@@ -38,6 +42,10 @@ Language: [English](README.md) | 中文简体
   * [从`File`或`Uint8List`创建`AssetEntity`的方法](#从file或uint8list创建assetentity的方法)
   * [控制台提示 'Failed to find GeneratedAppGlideModule'](#控制台提示-failed-to-find-generatedappglidemodule)
 
+## 迁移指南 ♻️
+
+查看 [迁移指南](doc/migration_guide.md).
+
 ## 特性 ✨
 
 - [x] 💚 99%的微信风格
@@ -47,7 +55,7 @@ Language: [English](README.md) | 中文简体
 - [x] 🎶 音频资源支持
 - [x] 1️⃣ 单资源模式
 - [x] 💱 国际化支持
-- [x] ➕ 自定义 widget 构建支持（前置/后置）
+- [x] ➕ 特殊 widget 构建支持（前置/后置）
 - [x] 🗂 自定义路径排序支持
 - [x] 📝 自定义文本构建支持
 - [x] ⏳ 自定义筛选规则支持（ `photo_manager` ）
@@ -135,25 +143,26 @@ platform :ios, '9.0'
 
 ## 使用方法 📖
 
-| 参数名              | 类型                  | 描述                                      | 默认值             |
-| ------------------ | -------------------- | ------------------------------------------------ | ------------------- |
-| maxAssets          | `int`                | 最多选择的图片数量                      | 9                   |
-| pageSize           | `int`                | 分页加载时每页加载的资源数量。**必须为网格数的倍数。** 设置为`null`可以取消分页。 | 320 (80 * 4) |
-| pathThumbSize      | `int`                | 选择器的缩略图大小                      | 80                  |
-| gridCount          | `int`                | 选择器网格数量                        | 4                   |
-| previewThumbSize   | `List<int>`          | 预览时图片的缩略图大小                    | `null`                 |
-| requestType        | `RequestType`        | 选择器选择资源的类型                    | `RequestType.image` |
-| specialPickerType  | `SpecialPickerType`  | 提供一些特殊的选择器类型以整合非常规的选择行为 | `null` |
-| selectedAssets     | `List<AssetEntity>`  | 已选的资源。确保不重复选择。如果你允许重复选择，请将其置空。 | `null`              |
-| themeColor         | `Color`              | 选择器的主题色  | `Color(0xff00bc56)` |
-| pickerTheme        | `ThemeData`          | 选择器的主题提供，包括查看器 | `null` |
-| sortPathDelegate   | `SortPathDeleage`    | 资源路径的排序实现，可自定义路径排序方法 | `CommonSortPathDelegate` |
-| textDelegate       | `DefaultAssetsPickerTextDelegate` | 选择器的文本代理构建，用于自定义文本 | `DefaultAssetsPickerTextDelegate()` |
-| filterOptions      | `FilterOptionGroup`  | Allow users to customize assets filter options. | `null` |
-| customItemBuilder  | `WidgetBuilder`      | 自定义item的构造方法 | `null` |
-| customItemPosition | `CustomItemPosition` | 允许用户在选择器中添加一个自定义item，并指定位置。 | `CustomItemPosition.none` |
-| routeCurve         | `Curve`              | 选择构造路由动画的曲线 | `Curves.easeIn` |
-| routeDuration      | `Duration`           | 选择构造路由动画的时间 | `const Duration(milliseconds: 500)` |
+| 参数名                     | 类型                   | 描述                                      | 默认值             |
+| ------------------------- | --------------------- | ------------------------------------------------ | ------------------- |
+| maxAssets                 | `int`                 | 最多选择的图片数量                      | 9                   |
+| pageSize                  | `int`                 | 分页加载时每页加载的资源数量。**必须为网格数的倍数。** 设置为`null`可以取消分页。 | 320 (80 * 4) |
+| pathThumbSize             | `int`                 | 选择器的缩略图大小                      | 80                  |
+| gridCount                 | `int`                 | 选择器网格数量                        | 4                   |
+| previewThumbSize          | `List<int>`           | 预览时图片的缩略图大小                    | `null`                 |
+| requestType               | `RequestType`         | 选择器选择资源的类型                    | `RequestType.image` |
+| specialPickerType         | `SpecialPickerType`   | 提供一些特殊的选择器类型以整合非常规的选择行为 | `null` |
+| selectedAssets            | `List<AssetEntity>`   | 已选的资源。确保不重复选择。如果你允许重复选择，请将其置空。 | `null`              |
+| themeColor                | `Color`               | 选择器的主题色  | `Color(0xff00bc56)` |
+| pickerTheme               | `ThemeData`           | 选择器的主题提供，包括查看器 | `null` |
+| sortPathDelegate          | `SortPathDeleage`     | 资源路径的排序实现，可自定义路径排序方法 | `CommonSortPathDelegate` |
+| textDelegate              | `DefaultAssetsPickerTextDelegate` | 选择器的文本代理构建，用于自定义文本 | `DefaultAssetsPickerTextDelegate()` |
+| filterOptions             | `FilterOptionGroup`   | 允许用户自定义资源过滤条件 | `null` |
+| specialItemBuilder        | `WidgetBuilder`       | 自定义item的构造方法 | `null` |
+| specialItemPosition       | `SpecialItemPosition` | 允许用户在选择器中添加一个自定义item，并指定位置。 | `SpecialPosition.none` |
+| allowSpecialItemWhenEmpty | `bool`                | 在资源为空时是否允许显示自定义item  | `false` |
+| routeCurve                | `Curve`               | 选择构造路由动画的曲线 | `Curves.easeIn` |
+| routeDuration             | `Duration`            | 选择构造路由动画的时间 | `const Duration(milliseconds: 500)` |
 
 ### 简单的使用方法
 
@@ -172,6 +181,16 @@ AssetPicker.pickAsset(context).then((List<AssetEntity> assets) {
 ### 完整参数的使用方法
 
 欲了解各种选择器模式，请直接运行 example 查看。
+
+### 展示选中的资源
+
+`AssetEntityImageProvider` 可以为 **图片 & 视频** 展示缩略图，以及展示 **图片的原图**。它的使用方法与常见的 `ImageProvider` 一致。
+
+```dart
+Image(image: AssetEntityImageProvider(asset, isOriginal: false))
+```
+
+请查看示例以了解它如何进行展示。
 
 ### 注册资源变化回调
 ```dart
