@@ -4,15 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 5.0.0-nullsafety.5
+## 5.0.1
+
+- Fix video indicator layout issue.
+- Prevent video selec in wechat moment mode for edge cases.
+- Pickup fixes from `photo_manager`.
+
+## 5.0.0
 
 - Add ability to show the special item when the device has no assets.
 - Allow users build their own picker with custom assets types. (See example for custom delegate.)
+- Slightly reduce performance consume with layout.
 
 ### Breaking changes
 
 - Migrate to non-nullable by default.
-- Drop support for Flutter 1.17 .
 - `CustomItemBuilder` -> `SpecialItemBuilder`, `CustomItemPosition` -> `SpecialItemPosition` .
 - Abstract `AssetPickerBuilderDelegate<A, P>`, `AssetPickerViewerBuilderDelegate<A, P>`,
   `AssetPickerProvider<A, P>`, and minify the `AssetPickerViewerProvider<A>`. Support
